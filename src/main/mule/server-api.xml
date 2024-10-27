@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="fa213d06-ceac-4d74-a6cf-c5bc26ea9922" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<flow name="server-apiFlow" doc:id="185e0a4f-5363-4ca9-97c7-9aac62538a2b" >
+		<http:listener doc:name="Listener" doc:id="30b3c93b-dff7-45eb-84ea-7ec42ba19bdf" config-ref="HTTP_Listener_config" path="/details"/>
+		<logger level="INFO" doc:name="Logger" doc:id="c790cac1-6019-4d17-8b01-d33a1b335088" message='#["Request received from " ++ server.ip]'/>
+		<ee:transform doc:name="Transform Message" doc:id="df5b59fe-21cb-4bc4-b3de-be7c2334f925" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	host: server.host,
+	ip: server.ip,
+	timestamp: now(),
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="bab22e6e-7d9e-4862-8ad8-eaa29cd2d3e8" message='#["Request completed"]'/>
+	</flow>
+</mule>
